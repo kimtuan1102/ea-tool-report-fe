@@ -154,12 +154,6 @@
         },
         {
           sortable: false,
-          text: '%',
-          value: 'percent',
-          align: 'right',
-        },
-        {
-          sortable: false,
           text: 'Current Balance',
           value: 'currentBalance',
           align: 'right',
