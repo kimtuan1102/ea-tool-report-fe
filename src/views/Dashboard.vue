@@ -49,10 +49,10 @@
                 </v-icon>
               </template>
               <template #item.percent="{ item }">
-                {{ (item['currentBalance']/item['initialBalance'])*100 - 100 }}
+                {{ Math.ceil((item['currentBalance']/item['initialBalance'])*100 - 100) }}
               </template>
               <template #item.$="{ item }">
-                {{ doLaCalc(item)}}
+                {{ doLaCalc(item) }}
               </template>
             </v-data-table>
           </v-card-text>
@@ -290,19 +290,17 @@
       doLaCalc (item) {
         const balance0 = item.initialBalance
         const balance1 = item.currentBalance
+        let doLa = 0
         if (balance0 < 7000 && balance1 > balance0) {
-          return (balance1 - balance0 - 50) * 0.15
+          doLa = (balance1 - balance0 - 50) * 0.15
+        } else if (balance0 >= 7000 && balance0 < 10000 && balance1 > balance0) {
+          doLa = (balance1 - balance0 - 100) * 0.15
+        } else if (balance0 >= 10000 && balance0 < 20000 && balance1 > balance0) {
+          doLa = (balance1 - balance0 - 150) * 0.15
+        } else if (balance0 >= 20000 && balance1 > balance0) {
+          doLa = (balance1 - balance0 - 200) * 0.15
         }
-        if (balance0 >= 7000 && balance0 < 10000 && balance1 > balance0) {
-          return (balance1 - balance0 - 100) * 0.15
-        }
-        if (balance0 >= 10000 && balance0 < 20000 && balance1 > balance0) {
-          return (balance1 - balance0 - 150) * 0.15
-        }
-        if (balance0 >= 20000 && balance1 > balance0) {
-          return (balance1 - balance0 - 200) * 0.15
-        }
-        return 0
+        return Math.ceil(doLa)
       },
     },
     mounted () {
