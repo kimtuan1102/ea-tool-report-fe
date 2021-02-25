@@ -14,13 +14,25 @@
           full-header
         >
           <template #heading>
-            <div class="pa-8 white--text">
-              <div class="text-h4 font-weight-light">
-                EA REPORT
+            <div
+              class="pa-8 white--text"
+              style="display: flex"
+            >
+              <div>
+                <div class="text-h4 font-weight-light">
+                  EA REPORT
+                </div>
+                <div class="text-caption">
+                  Report of EA copy
+                </div>
               </div>
-              <div class="text-caption">
-                Report of EA copy
-              </div>
+              <v-spacer />
+              <v-btn
+                color="primary"
+                @click="resetReportData"
+              >
+                Reset
+              </v-btn>
             </div>
           </template>
           <v-card-text>
@@ -28,14 +40,87 @@
               :headers="headers"
               :items="reportData"
             >
+              <template #item.action="{ item }">
+                <v-icon
+                  class="mx-1"
+                  @click="openDialog(item)"
+                >
+                  mdi-pencil
+                </v-icon>
+              </template>
               <template #item.percent="{ item }">
-                {{ item.selfOrder + item.botOrder }}
+                {{ (item['currentBalance']/item['initialBalance'])*100 - 100 }}
+              </template>
+              <template #item.$="{ item }">
+                {{ doLaCalc(item)}}
               </template>
             </v-data-table>
           </v-card-text>
         </material-card>
       </v-col>
     </v-row>
+    <v-dialog
+      v-model="dialogEdit"
+      max-width="500"
+    >
+      <v-card>
+        <v-card-title>
+          Edit Balance 0?
+
+          <v-spacer />
+
+          <v-icon
+            aria-label="Close"
+            @click="dialogEdit = false"
+          >
+            mdi-close
+          </v-icon>
+        </v-card-title>
+
+        <v-card-text class="text-body-1 text-center">
+          <v-form>
+            <v-container class="py-0">
+              <v-row>
+                <v-col
+                  cols="12"
+                  md="12"
+                >
+                  <v-text-field
+                    v-model="accountId"
+                    disabled
+                    label="Account ID"
+                  />
+                </v-col>
+
+                <v-col
+                  cols="12"
+                  md="12"
+                >
+                  <v-text-field
+                    v-model="initialBalance"
+                    prefix="$"
+                    color="purple"
+                    type="number"
+                    label="Initial Balance"
+                  />
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-form>
+
+          <v-btn
+            class="mt-6"
+            color="info"
+            depressed
+            default
+            rounded
+            @click="updateData"
+          >
+            Update
+          </v-btn>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -53,6 +138,9 @@
     name: 'DashboardView',
 
     data: () => ({
+      dialogEdit: false,
+      accountId: '',
+      initialBalance: '',
       charts: [{
         type: 'Bar',
         color: 'primary',
@@ -137,26 +225,44 @@
       }],
       headers: [
         {
-          sortable: false,
-          text: 'Account ID',
+          sortable: true,
+          text: 'ID',
           value: 'accountId',
         },
         {
-          sortable: false,
-          text: 'Bot Order',
+          sortable: true,
+          text: 'Balance 0',
+          value: 'initialBalance',
+        },
+        {
+          sortable: true,
+          text: 'Balance 1',
+          value: 'currentBalance',
+        },
+        {
+          sortable: true,
+          text: '%',
+          value: 'percent',
+        },
+        {
+          sortable: true,
+          text: '$',
+          value: '$',
+        },
+        {
+          sortable: true,
+          text: 'Bot',
           value: 'botOrder',
         },
         {
-          sortable: false,
-          text: 'Self Order',
+          sortable: true,
+          text: 'Tự đánh',
           value: 'selfOrder',
-          align: 'right',
         },
         {
           sortable: false,
-          text: 'Current Balance',
-          value: 'currentBalance',
-          align: 'right',
+          text: 'Action',
+          value: 'action',
         },
       ],
     }),
@@ -169,7 +275,35 @@
       },
     },
     methods: {
-      ...mapActions('report', ['getAllReportData']),
+      ...mapActions('report', ['getAllReportData', 'updateInitialBalance', 'resetReportData']),
+      openDialog (item) {
+        this.accountId = item.accountId
+        this.initialBalance = item.initialBalance
+        this.dialogEdit = true
+      },
+      updateData () {
+        const accountId = this.accountId
+        const initialBalance = this.initialBalance
+        this.updateInitialBalance({ accountId, initialBalance })
+        this.dialogEdit = false
+      },
+      doLaCalc (item) {
+        const balance0 = item.initialBalance
+        const balance1 = item.currentBalance
+        if (balance0 < 7000 && balance1 > balance0) {
+          return (balance1 - balance0 - 50) * 0.15
+        }
+        if (balance0 >= 7000 && balance0 < 10000 && balance1 > balance0) {
+          return (balance1 - balance0 - 100) * 0.15
+        }
+        if (balance0 >= 10000 && balance0 < 20000 && balance1 > balance0) {
+          return (balance1 - balance0 - 150) * 0.15
+        }
+        if (balance0 >= 20000 && balance1 > balance0) {
+          return (balance1 - balance0 - 200) * 0.15
+        }
+        return 0
+      },
     },
     mounted () {
       this.getAllReportData()
