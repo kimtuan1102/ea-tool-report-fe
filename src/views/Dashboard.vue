@@ -30,6 +30,7 @@
               <v-btn
                 color="primary"
                 @click="resetReportData"
+                disabled
               >
                 Reset
               </v-btn>
