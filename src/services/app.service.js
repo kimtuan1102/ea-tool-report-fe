@@ -3,11 +3,17 @@ const AppService = {
   getAllReport () {
     return $http.get('/copy/reports/')
   },
-  updateInitialBalance (accountId, initialBalance) {
-    return $http.post('/copy/update-initial-balance', { accountId: accountId, initialBalance: initialBalance })
+  updateReportFields (accountId, initialBalance, telegram, deposit, withdraw) {
+    return $http.post('/copy/update-report-fields',
+      {
+        accountId: accountId, initialBalance: initialBalance, telegram: telegram, deposit: deposit, withdraw: withdraw,
+      })
   },
   resetReportData () {
     return $http.post('/copy/reset-report-data')
+  },
+  reportExcels () {
+    window.location.href = process.env.VUE_APP_BASE_API + '/copy/excels-report-data'
   },
 }
 export default AppService

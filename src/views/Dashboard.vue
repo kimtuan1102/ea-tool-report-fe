@@ -29,10 +29,22 @@
               <v-spacer />
               <v-btn
                 color="primary"
-                @click="resetReportData"
                 disabled
+                style="text-transform: none"
+                @click="resetReportData"
               >
                 Reset
+              </v-btn>
+              <v-btn
+                color="#42be80"
+                class="ml-2"
+                style="text-transform: none"
+                @click="reportExcels"
+              >
+                <v-icon left>
+                  mdi-file-excel
+                </v-icon>
+                Report
               </v-btn>
             </div>
           </template>
@@ -105,6 +117,36 @@
                     label="Initial Balance"
                   />
                 </v-col>
+                <v-col
+                  cols="12"
+                  md="12"
+                >
+                  <v-text-field
+                    v-model="telegram"
+                    color="purple"
+                    label="Telegram"
+                  />
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="12"
+                >
+                  <v-text-field
+                    v-model="deposit"
+                    color="purple"
+                    label="Deposit"
+                  />
+                </v-col>
+                <v-col
+                  cols="12"
+                  md="12"
+                >
+                  <v-text-field
+                    v-model="withdraw"
+                    color="purple"
+                    label="Withdraw"
+                  />
+                </v-col>
               </v-row>
             </v-container>
           </v-form>
@@ -130,6 +172,7 @@
   import { get } from 'vuex-pathify'
   import Vue from 'vue'
   import { mapActions, mapState } from 'vuex'
+  import AppService from '../services/app.service'
 
   const lineSmooth = Vue.chartist.Interpolation.cardinal({
     tension: 0,
@@ -142,6 +185,9 @@
       dialogEdit: false,
       accountId: '',
       initialBalance: '',
+      telegram: '',
+      deposit: '',
+      withdraw: '',
       charts: [{
         type: 'Bar',
         color: 'primary',
@@ -262,6 +308,21 @@
         },
         {
           sortable: false,
+          text: 'Telegram',
+          value: 'telegram',
+        },
+        {
+          sortable: true,
+          text: 'Deposit',
+          value: 'deposit',
+        },
+        {
+          sortable: true,
+          text: 'Withdraw',
+          value: 'withdraw',
+        },
+        {
+          sortable: false,
           text: 'Action',
           value: 'action',
         },
@@ -276,16 +337,22 @@
       },
     },
     methods: {
-      ...mapActions('report', ['getAllReportData', 'updateInitialBalance', 'resetReportData']),
+      ...mapActions('report', ['getAllReportData', 'updateReportFields', 'resetReportData']),
       openDialog (item) {
         this.accountId = item.accountId
         this.initialBalance = item.initialBalance
+        this.telegram = item.telegram
+        this.deposit = item.deposit
+        this.withdraw = item.withdraw
         this.dialogEdit = true
       },
       updateData () {
         const accountId = this.accountId
         const initialBalance = this.initialBalance
-        this.updateInitialBalance({ accountId, initialBalance })
+        const telegram = this.telegram
+        const deposit = this.deposit
+        const withdraw = this.withdraw
+        this.updateReportFields({ accountId, initialBalance, telegram, deposit, withdraw })
         this.dialogEdit = false
       },
       doLaCalc (item) {
@@ -302,6 +369,9 @@
           doLa = (balance1 - balance0 - 200) * 0.15
         }
         return Math.ceil(doLa)
+      },
+      reportExcels () {
+        AppService.reportExcels()
       },
     },
     mounted () {

@@ -18,8 +18,8 @@ const actions = {
       context.commit('setReportData', res.data)
     })
   },
-  updateInitialBalance (context, { accountId, initialBalance }) {
-    AppService.updateInitialBalance(accountId, initialBalance).then(res => {
+  updateReportFields (context, { accountId, initialBalance, telegram, deposit, withdraw }) {
+    AppService.updateReportFields(accountId, initialBalance, telegram, deposit, withdraw).then(res => {
       context.commit('updateReport', res.data)
     })
   },
