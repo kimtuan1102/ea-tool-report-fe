@@ -13,7 +13,7 @@ const AppService = {
     return $http.post('/copy/reset-report-data')
   },
   reportExcels () {
-    window.location.href = process.env.VUE_APP_BASE_API_PUBLIC + '/copy/excels-report-data'
+    window.location.href = '/copy/excels-report-data'
   },
 }
 export default AppService
