@@ -5,7 +5,7 @@
     align="center"
   >
     <v-col
-      cols="6"
+      cols="12"
       md="3"
     >
       <material-card
