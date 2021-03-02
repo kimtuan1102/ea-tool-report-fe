@@ -24,42 +24,34 @@
         <v-card-text>
           <v-card-text class="text-body-1 text-center">
             <v-form>
-              <v-container class="py-0">
-                <v-row>
-                  <v-col
-                    cols="12"
-                    md="12"
-                  >
-                    <v-text-field
-                      v-model="email"
-                      label="Email"
-                    />
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="12"
-                  >
-                    <v-text-field
-                      v-model="password"
-                      color="purple"
-                      label="Password"
-                      type="password"
-                    />
-                  </v-col>
-                </v-row>
-              </v-container>
+              <v-text-field
+                v-model="email"
+                label="Email"
+                :error-messages="emailErrors"
+                required
+                @input="$v.email.$touch()"
+                @blur="$v.email.$touch()"
+              />
+              <v-text-field
+                v-model="password"
+                :error-messages="passwordErrors"
+                :counter="6"
+                label="Password"
+                required
+                @input="$v.name.$touch()"
+                @blur="$v.name.$touch()"
+              />
+              <v-btn
+                class="mt-6 accent--text"
+                rounded
+                light
+                large
+                text
+                @click="submit"
+              >
+                LET'S GO
+              </v-btn>
             </v-form>
-
-            <v-btn
-              class="mt-6 accent--text"
-              rounded
-              light
-              large
-              text
-              @click="login({email, password})"
-            >
-              LET'S GO
-            </v-btn>
           </v-card-text>
         </v-card-text>
       </material-card>
@@ -69,15 +61,44 @@
 
 <script>
   import { mapActions } from 'vuex'
+  import { validationMixin } from 'vuelidate'
+  import { required, maxLength, email } from 'vuelidate/lib/validators'
 
   export default {
     name: 'Login',
+    mixins: [validationMixin],
+    validations: {
+      password: { required, maxLength: maxLength(6) },
+      email: { required, email },
+    },
     data: () => ({
       password: '',
       email: '',
     }),
+    computed: {
+      passwordErrors () {
+        const errors = []
+        if (!this.$v.password.$dirty) return errors
+        !this.$v.password.maxLength && errors.push('Password must be at most 6 characters long')
+        !this.$v.password.required && errors.push('Password is required.')
+        return errors
+      },
+      emailErrors () {
+        const errors = []
+        if (!this.$v.email.$dirty) return errors
+        !this.$v.email.email && errors.push('Must be valid e-mail')
+        !this.$v.email.required && errors.push('E-mail is required')
+        return errors
+      },
+    },
     methods: {
       ...mapActions('auth', ['login']),
+      submit () {
+        this.$v.$touch()
+        const email = this.email
+        const password = this.password
+        this.login({ email, password })
+      },
     },
   }
 </script>
