@@ -27,25 +27,7 @@
                 </div>
               </div>
               <v-spacer />
-              <v-btn
-                color="primary"
-                style="text-transform: none"
-                @click="resetReportData"
-                v-if="userProfile.roles.includes('admin')"
-              >
-                Reset
-              </v-btn>
-              <v-btn
-                color="#42be80"
-                class="ml-2"
-                style="text-transform: none"
-                @click="reportExcels"
-              >
-                <v-icon left>
-                  mdi-file-excel
-                </v-icon>
-                Report
-              </v-btn>
+              <report-action />
             </div>
           </template>
           <v-card-text>
@@ -173,6 +155,7 @@
   import Vue from 'vue'
   import { mapActions, mapState } from 'vuex'
   import AppService from '../services/app.service'
+  import ReportAction from '../layouts/default/widgets/ReportAction'
 
   const lineSmooth = Vue.chartist.Interpolation.cardinal({
     tension: 0,
@@ -180,7 +163,7 @@
 
   export default {
     name: 'DashboardView',
-
+    components: { ReportAction },
     data: () => ({
       dialogEdit: false,
       accountId: '',
@@ -377,7 +360,7 @@
       },
     },
     mounted () {
-      this.getProfile();
+      this.getProfile()
       this.getAllReportData()
     },
   }
