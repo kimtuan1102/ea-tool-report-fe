@@ -35,11 +35,11 @@
               <v-text-field
                 v-model="password"
                 :error-messages="passwordErrors"
-                :counter="6"
                 label="Password"
                 required
                 @input="$v.name.$touch()"
                 @blur="$v.name.$touch()"
+                type="password"
               />
               <v-btn
                 class="mt-6 accent--text"
@@ -62,13 +62,13 @@
 <script>
   import { mapActions } from 'vuex'
   import { validationMixin } from 'vuelidate'
-  import { required, maxLength, email } from 'vuelidate/lib/validators'
+  import { required, email } from 'vuelidate/lib/validators'
 
   export default {
     name: 'Login',
     mixins: [validationMixin],
     validations: {
-      password: { required, maxLength: maxLength(6) },
+      password: { required },
       email: { required, email },
     },
     data: () => ({
@@ -79,7 +79,6 @@
       passwordErrors () {
         const errors = []
         if (!this.$v.password.$dirty) return errors
-        !this.$v.password.maxLength && errors.push('Password must be at most 6 characters long')
         !this.$v.password.required && errors.push('Password is required.')
         return errors
       },
