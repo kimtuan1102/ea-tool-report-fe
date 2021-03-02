@@ -36,7 +36,15 @@
           :key="`item-${i}`"
           to="/"
         >
-          <v-list-item-title v-text="p.title" />
+          <v-list-item-title
+            v-if="p.title==='Log out'"
+            @click="logout"
+            v-text="p.title"
+          />
+          <v-list-item-title
+            v-else
+            v-text="p.title"
+          />
         </app-bar-item>
       </template>
     </v-list>
@@ -44,16 +52,18 @@
 </template>
 
 <script>
+  import { mapActions } from 'vuex'
+
   export default {
     name: 'DefaultAccount',
 
     data: () => ({
       profile: [
-        { title: 'Profile' },
-        { title: 'Settings' },
-        { divider: true },
         { title: 'Log out' },
       ],
     }),
+    methods: {
+      ...mapActions('auth', ['logout']),
+    },
   }
 </script>

@@ -1,12 +1,12 @@
 <template>
   <v-app>
-    <default-bar />
+    <default-bar v-if="isShowAppBarAndDrawer" />
 
-    <default-drawer />
+    <default-drawer v-if="isShowAppBarAndDrawer" />
 
     <default-view />
 
-    <default-footer />
+    <default-footer v-if="isShowAppBarAndDrawer" />
   </v-app>
 </template>
 
@@ -35,6 +35,11 @@
         /* webpackChunkName: "default-view" */
         './View'
       ),
+    },
+    computed: {
+      isShowAppBarAndDrawer () {
+        return this.$route.name !== 'Login'
+      },
     },
   }
 </script>

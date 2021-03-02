@@ -2,10 +2,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import { trailingSlash } from '@/util/helpers'
+import store from '@/store'
 import {
   layout,
   route,
 } from '@/util/routes'
+import AppService from '../services/app.service'
 
 Vue.use(Router)
 
@@ -20,13 +22,19 @@ const router = new Router({
   },
   routes: [
     layout('Default', [
-      route('Dashboard'),
+      route('Dashboard', null, '/', { requiresAuth: true }),
+      route('Login', null, '/login'),
     ]),
   ],
 })
 
 router.beforeEach((to, from, next) => {
-  return to.path.endsWith('/') ? next() : next(trailingSlash(to.path))
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!store.state.auth.token) {
+      router.push('/login').catch(() => {})
+    }
+  }
+  next()
 })
 
 export default router

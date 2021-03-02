@@ -29,9 +29,9 @@
               <v-spacer />
               <v-btn
                 color="primary"
-                disabled
                 style="text-transform: none"
                 @click="resetReportData"
+                v-if="userProfile.roles.includes('admin')"
               >
                 Reset
               </v-btn>
@@ -332,12 +332,14 @@
     computed: {
       sales: get('sales/sales'),
       ...mapState('report', ['reportData']),
+      ...mapState('auth', ['userProfile']),
       totalSales () {
         return this.sales.reduce((acc, val) => acc + val.salesInM, 0)
       },
     },
     methods: {
       ...mapActions('report', ['getAllReportData', 'updateReportFields', 'resetReportData']),
+      ...mapActions('auth', ['getProfile']),
       openDialog (item) {
         this.accountId = item.accountId
         this.initialBalance = item.initialBalance
@@ -375,6 +377,7 @@
       },
     },
     mounted () {
+      this.getProfile();
       this.getAllReportData()
     },
   }
