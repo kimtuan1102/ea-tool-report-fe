@@ -17,21 +17,27 @@ const mutations = {
   updateField,
 }
 const actions = {
-  getAllReportData ({ commit, state }) {
+  getAllReportData ({ commit, state, dispatch }) {
     const accountId = state.accountIdSearch
     const zalo = state.zaloSearch
+    dispatch('loading/openLoading', null, { root: true })
     AppService.getReports({ accountId, zalo }).then(res => {
       commit('setReportData', res.data)
+      dispatch('loading/closeLoading', null, { root: true })
     })
   },
   updateReportFields (context, { accountId, initialBalance, zalo, deposit, withdraw, expireDate }) {
+    context.dispatch('loading/openLoading', null, { root: true })
     AppService.updateReportFields(accountId, initialBalance, zalo, deposit, withdraw, expireDate).then(res => {
       context.commit('updateReport', res.data)
+      context.dispatch('loading/closeLoading', null, { root: true })
     })
   },
   resetReportData (context) {
+    context.dispatch('loading/openLoading', null, { root: true })
     AppService.resetReportData().then(res => {
       context.dispatch('getAllReportData')
+      context.dispatch('loading/closeLoading', null, { root: true })
     })
   },
   reportExcels ({ commit, state }) {

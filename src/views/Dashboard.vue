@@ -12,24 +12,15 @@
         <v-row>
           <v-col
             cols="12"
-            md="4"
+            md="3"
           >
-            <v-text-field
-              v-model="accountIdSearch"
-              label="Accout ID"
+            <v-select
+              v-model="searchItemSelected"
+              :items="searchItems"
+              label="Search"
+              item-text="name"
+              item-value="id"
               solo
-              clearable
-            />
-          </v-col>
-          <v-col
-            cols="12"
-            md="4"
-          >
-            <v-text-field
-              v-model="zaloSearch"
-              label="Zalo"
-              solo
-              clearable
             />
           </v-col>
           <v-col
@@ -177,13 +168,13 @@
                   v-bind="attrs"
                   @blur="date = parseDate(dateFormatted)"
                   v-on="on"
-                ></v-text-field>
+                />
               </template>
               <v-date-picker
                 v-model="expireDate"
                 no-title
                 @input="menu1 = false"
-              ></v-date-picker>
+              />
             </v-menu>
             <v-btn
               class="mt-6"
@@ -236,6 +227,7 @@
       withdraw: '',
       expireDate: new Date().toISOString().substr(0, 10),
       menu1: false,
+      searchItemSelected: '',
       headers: [
         {
           sortable: true,
@@ -292,6 +284,12 @@
           text: 'Action',
           value: 'action',
         },
+      ],
+      searchItems: [
+        { id: 1, name: 'Tài khoản sắp hết hạn ( 7 ngày )' },
+        { id: 2, name: 'Tài tự đánh 1 lần' },
+        { id: 3, name: 'Tài tự đánh 2 lần' },
+        { id: 4, name: 'Tài tự đánh nhiều hơn 2 lần' },
       ],
     }),
 
@@ -386,14 +384,17 @@
         return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
       },
     },
-    mounted () {
-      this.getProfile()
-      this.getAllReportData()
-    },
     watch: {
       expireDate (val) {
         this.dateFormatted = this.formatDate(this.expireDate)
       },
+      searchItemSelected () {
+        this.getAllReportData()
+      },
+    },
+    mounted () {
+      this.getProfile()
+      this.getAllReportData()
     },
   }
 </script>
