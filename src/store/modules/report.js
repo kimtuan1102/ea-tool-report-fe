@@ -4,7 +4,7 @@ import { getField, updateField } from 'vuex-map-fields'
 const state = () => ({
   reportData: [],
   accountIdSearch: '',
-  telegramSearch: '',
+  zaloSearch: '',
 })
 const mutations = {
   setReportData (state, data) {
@@ -19,13 +19,13 @@ const mutations = {
 const actions = {
   getAllReportData ({ commit, state }) {
     const accountId = state.accountIdSearch
-    const telegram = state.telegramSearch
-    AppService.getReports({ accountId, telegram }).then(res => {
+    const zalo = state.zaloSearch
+    AppService.getReports({ accountId, zalo }).then(res => {
       commit('setReportData', res.data)
     })
   },
-  updateReportFields (context, { accountId, initialBalance, telegram, deposit, withdraw }) {
-    AppService.updateReportFields(accountId, initialBalance, telegram, deposit, withdraw).then(res => {
+  updateReportFields (context, { accountId, initialBalance, zalo, deposit, withdraw, expireDate }) {
+    AppService.updateReportFields(accountId, initialBalance, zalo, deposit, withdraw, expireDate).then(res => {
       context.commit('updateReport', res.data)
     })
   },
@@ -36,8 +36,8 @@ const actions = {
   },
   reportExcels ({ commit, state }) {
     const accountId = state.accountIdSearch
-    const telegram = state.telegramSearch
-    AppService.reportExcels({ accountId, telegram })
+    const zalo = state.zaloSearch
+    AppService.reportExcels({ accountId, zalo })
   },
 }
 const getters = {

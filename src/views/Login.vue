@@ -29,17 +29,17 @@
                 label="Email"
                 :error-messages="emailErrors"
                 required
-                @input="$v.email.$touch()"
-                @blur="$v.email.$touch()"
+                @input="$v.$touch()"
+                @blur="$v.$touch()"
               />
               <v-text-field
                 v-model="password"
                 :error-messages="passwordErrors"
                 label="Password"
                 required
-                @input="$v.name.$touch()"
-                @blur="$v.name.$touch()"
                 type="password"
+                @input="$v.$touch()"
+                @blur="$v.$touch()"
               />
               <v-btn
                 class="mt-6 accent--text"
@@ -94,6 +94,7 @@
       ...mapActions('auth', ['login']),
       submit () {
         this.$v.$touch()
+        if (this.$v.$error) return
         const email = this.email
         const password = this.password
         this.login({ email, password })

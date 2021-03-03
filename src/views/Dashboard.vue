@@ -26,8 +26,8 @@
             md="4"
           >
             <v-text-field
-              v-model="telegramSearch"
-              label="Telegram"
+              v-model="zaloSearch"
+              label="Zalo"
               solo
               clearable
             />
@@ -89,12 +89,6 @@
                   mdi-pencil
                 </v-icon>
               </template>
-              <template #item.percent="{ item }">
-                {{ Math.ceil((item['currentBalance']/item['initialBalance'])*100 - 100) }}
-              </template>
-              <template #item.$="{ item }">
-                {{ doLaCalc(item) }}
-              </template>
             </v-data-table>
           </v-card-text>
         </material-card>
@@ -120,75 +114,88 @@
 
         <v-card-text class="text-body-1 text-center">
           <v-form>
-            <v-container class="py-0">
-              <v-row>
-                <v-col
-                  cols="12"
-                  md="12"
-                >
-                  <v-text-field
-                    v-model="accountId"
-                    disabled
-                    label="Account ID"
-                  />
-                </v-col>
-
-                <v-col
-                  cols="12"
-                  md="12"
-                >
-                  <v-text-field
-                    v-model="initialBalance"
-                    prefix="$"
-                    color="purple"
-                    type="number"
-                    label="Initial Balance"
-                  />
-                </v-col>
-                <v-col
-                  cols="12"
-                  md="12"
-                >
-                  <v-text-field
-                    v-model="telegram"
-                    color="purple"
-                    label="Telegram"
-                  />
-                </v-col>
-                <v-col
-                  cols="12"
-                  md="12"
-                >
-                  <v-text-field
-                    v-model="deposit"
-                    color="purple"
-                    label="Deposit"
-                  />
-                </v-col>
-                <v-col
-                  cols="12"
-                  md="12"
-                >
-                  <v-text-field
-                    v-model="withdraw"
-                    color="purple"
-                    label="Withdraw"
-                  />
-                </v-col>
-              </v-row>
-            </v-container>
+            <v-text-field
+              v-model="accountId"
+              disabled
+              label="Account ID"
+            />
+            <v-text-field
+              v-model="initialBalance"
+              prefix="$"
+              color="purple"
+              type="number"
+              :error-messages="initialBalanceErrors"
+              required
+              label="Initial Balance"
+              @input="$v.initialBalance.$touch()"
+              @blur="$v.initialBalance.$touch()"
+            />
+            <v-text-field
+              v-model="zalo"
+              color="purple"
+              :error-messages="zaloErrors"
+              required
+              label="Zalo"
+              @input="$v.zalo.$touch()"
+              @blur="$v.zalo.$touch()"
+            />
+            <v-text-field
+              v-model="deposit"
+              color="purple"
+              :error-messages="depositErrors"
+              required
+              type="number"
+              label="Deposit"
+              @input="$v.deposit.$touch()"
+              @blur="$v.deposit.$touch()"
+            />
+            <v-text-field
+              v-model="withdraw"
+              color="purple"
+              type="number"
+              :error-messages="withdrawErrors"
+              required
+              label="Withdraw"
+              @input="$v.withdraw.$touch()"
+              @blur="$v.withdraw.$touch()"
+            />
+            <v-menu
+              ref="menu1"
+              v-model="menu1"
+              :close-on-content-click="false"
+              transition="scale-transition"
+              offset-y
+              max-width="290px"
+              min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="dateFormatted"
+                  label="Expire Date"
+                  hint="MM/DD/YYYY format"
+                  persistent-hint
+                  v-bind="attrs"
+                  @blur="date = parseDate(dateFormatted)"
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="expireDate"
+                no-title
+                @input="menu1 = false"
+              ></v-date-picker>
+            </v-menu>
+            <v-btn
+              class="mt-6"
+              color="info"
+              depressed
+              default
+              rounded
+              @click="updateData"
+            >
+              Update
+            </v-btn>
           </v-form>
-
-          <v-btn
-            class="mt-6"
-            color="info"
-            depressed
-            default
-            rounded
-            @click="updateData"
-          >
-            Update
-          </v-btn>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -200,10 +207,10 @@
   import { get } from 'vuex-pathify'
   import Vue from 'vue'
   import { mapActions, mapState } from 'vuex'
-  import AppService from '../services/app.service'
   import ReportAction from '../layouts/default/widgets/ReportAction'
   import { mapFields } from 'vuex-map-fields'
-
+  import { validationMixin } from 'vuelidate'
+  import { required, email } from 'vuelidate/lib/validators'
   const lineSmooth = Vue.chartist.Interpolation.cardinal({
     tension: 0,
   })
@@ -211,95 +218,24 @@
   export default {
     name: 'DashboardView',
     components: { ReportAction },
-    data: () => ({
+    mixins: [validationMixin],
+    validations: {
+      initialBalance: { required },
+      zalo: { required },
+      deposit: { required },
+      withdraw: { required },
+      expireDate: { required },
+    },
+    data: (vm) => ({
+      dateFormatted: vm.formatDate(new Date().toISOString().substr(0, 10)),
       dialogEdit: false,
       accountId: '',
       initialBalance: '',
-      telegram: '',
+      zalo: '',
       deposit: '',
       withdraw: '',
-      charts: [{
-        type: 'Bar',
-        color: 'primary',
-        title: 'Website Views',
-        subtitle: 'Last Campaign Performance',
-        time: 'updated 10 minutes ago',
-        data: {
-          labels: ['Ja', 'Fe', 'Ma', 'Ap', 'Mai', 'Ju', 'Jul', 'Au', 'Se', 'Oc', 'No', 'De'],
-          series: [
-            [542, 443, 320, 780, 553, 453, 326, 434, 568, 610, 756, 895],
-          ],
-        },
-        options: {
-          axisX: {
-            showGrid: false,
-          },
-          low: 0,
-          high: 1000,
-          chartPadding: {
-            top: 0,
-            right: 5,
-            bottom: 0,
-            left: 0,
-          },
-        },
-        responsiveOptions: [
-          ['screen and (max-width: 640px)', {
-            seriesBarDistance: 5,
-            axisX: {
-              labelInterpolationFnc: function (value) {
-                return value[0]
-              },
-            },
-          }],
-        ],
-      }, {
-        type: 'Line',
-        color: 'success',
-        title: 'Daily Sales',
-        subtitle: '<i class="mdi mdi-arrow-up green--text"></i><span class="green--text">55%</span>&nbsp;increase in today\'s sales',
-        time: 'updated 4 minutes ago',
-        data: {
-          labels: ['12am', '3pm', '6pm', '9pm', '12pm', '3am', '6am', '9am'],
-          series: [
-            [230, 750, 450, 300, 280, 240, 200, 190],
-          ],
-        },
-        options: {
-          lineSmooth,
-          low: 0,
-          high: 1000, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
-          chartPadding: {
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: 0,
-          },
-        },
-      }, {
-        type: 'Line',
-        color: 'info',
-        title: 'Completed Tasks',
-        subtitle: 'Last Campaign Performance',
-        time: 'campaign sent 26 minutes ago',
-        data: {
-          labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
-          series: [
-            [12, 17, 7, 17, 23, 18, 38],
-          ],
-        },
-        options: {
-          lineSmooth,
-          low: 0,
-          high: 50, // creative tim: we recommend you to set the high sa the biggest value + something for a better look
-          chartPadding: {
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: 0,
-          },
-        },
-      }],
+      expireDate: new Date().toISOString().substr(0, 10),
+      menu1: false,
       headers: [
         {
           sortable: true,
@@ -324,7 +260,7 @@
         {
           sortable: true,
           text: '$',
-          value: '$',
+          value: 'dollar',
         },
         {
           sortable: true,
@@ -338,8 +274,8 @@
         },
         {
           sortable: false,
-          text: 'Telegram',
-          value: 'telegram',
+          text: 'Zalo',
+          value: 'zalo',
         },
         {
           sortable: true,
@@ -363,9 +299,39 @@
       sales: get('sales/sales'),
       ...mapState('report', ['reportData']),
       ...mapState('auth', ['userProfile']),
-      ...mapFields('report', ['accountIdSearch', 'telegramSearch']),
-      totalSales () {
-        return this.sales.reduce((acc, val) => acc + val.salesInM, 0)
+      ...mapFields('report', ['accountIdSearch', 'zaloSearch']),
+      computedDateFormatted () {
+        return this.formatDate(this.date)
+      },
+      initialBalanceErrors () {
+        const errors = []
+        if (!this.$v.initialBalance.$dirty) return errors
+        !this.$v.initialBalance.required && errors.push('Initial Balance is required')
+        return errors
+      },
+      zaloErrors () {
+        const errors = []
+        if (!this.$v.zalo.$dirty) return errors
+        !this.$v.zalo.required && errors.push('Zalo is required')
+        return errors
+      },
+      depositErrors () {
+        const errors = []
+        if (!this.$v.deposit.$dirty) return errors
+        !this.$v.deposit.required && errors.push('Deposit is required')
+        return errors
+      },
+      withdrawErrors () {
+        const errors = []
+        if (!this.$v.withdraw.$dirty) return errors
+        !this.$v.withdraw.required && errors.push('Withdraw is required')
+        return errors
+      },
+      expireDateErrors () {
+        const errors = []
+        if (!this.$v.expireDate.$dirty) return errors
+        !this.$v.expireDate.required && errors.push('Expire date is required')
+        return errors
       },
     },
     methods: {
@@ -374,18 +340,22 @@
       openDialog (item) {
         this.accountId = item.accountId
         this.initialBalance = item.initialBalance
-        this.telegram = item.telegram
+        this.zalo = item.zalo
         this.deposit = item.deposit
         this.withdraw = item.withdraw
+        this.expireDate = new Date(item.expireDate).toISOString().substr(0, 10)
         this.dialogEdit = true
       },
       updateData () {
         const accountId = this.accountId
         const initialBalance = this.initialBalance
-        const telegram = this.telegram
+        const zalo = this.zalo
         const deposit = this.deposit
         const withdraw = this.withdraw
-        this.updateReportFields({ accountId, initialBalance, telegram, deposit, withdraw })
+        const expireDate = this.expireDate
+        this.$v.$touch()
+        if (this.$v.$error) return
+        this.updateReportFields({ accountId, initialBalance, zalo, deposit, withdraw, expireDate })
         this.dialogEdit = false
       },
       doLaCalc (item) {
@@ -403,10 +373,27 @@
         }
         return Math.ceil(doLa)
       },
+      formatDate (date) {
+        if (!date) return null
+
+        const [year, month, day] = date.split('-')
+        return `${month}/${day}/${year}`
+      },
+      parseDate (date) {
+        if (!date) return null
+
+        const [month, day, year] = date.split('/')
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      },
     },
     mounted () {
       this.getProfile()
       this.getAllReportData()
+    },
+    watch: {
+      expireDate (val) {
+        this.dateFormatted = this.formatDate(this.expireDate)
+      },
     },
   }
 </script>

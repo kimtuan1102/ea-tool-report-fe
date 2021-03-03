@@ -8,10 +8,10 @@ const AppService = {
     const queryStr = UtilsService.buildQuery(params)
     return $http.get(`/copy/reports?${queryStr}`)
   },
-  updateReportFields (accountId, initialBalance, telegram, deposit, withdraw) {
+  updateReportFields (accountId, initialBalance, zalo, deposit, withdraw, expireDate) {
     return $http.post('/copy/update-report-fields',
       {
-        accountId: accountId, initialBalance: initialBalance, telegram: telegram, deposit: deposit, withdraw: withdraw,
+        accountId: accountId, initialBalance: initialBalance, zalo: zalo, deposit: deposit, withdraw: withdraw, expireDate: expireDate,
       })
   },
   resetReportData () {
