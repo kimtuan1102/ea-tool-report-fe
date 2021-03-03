@@ -2,9 +2,11 @@ import $http from '../plugins/axios'
 import VueCookies from 'vue-cookies'
 import $const from '../common/const'
 import jwtDecode from 'jwt-decode'
+import UtilsService from './utils.service'
 const AppService = {
-  getAllReport () {
-    return $http.get('/copy/reports/')
+  getReports (params) {
+    const queryStr = UtilsService.buildQuery(params)
+    return $http.get(`/copy/reports?${queryStr}`)
   },
   updateReportFields (accountId, initialBalance, telegram, deposit, withdraw) {
     return $http.post('/copy/update-report-fields',
@@ -15,8 +17,10 @@ const AppService = {
   resetReportData () {
     return $http.post('/copy/reset-report-data')
   },
-  reportExcels () {
-    window.location.href = '/copy/excels-report-data'
+  reportExcels (params) {
+    const queryStr = UtilsService.buildQuery(params)
+    console.log(queryStr)
+    window.location.href = `/copy/excels-report-data?${queryStr}`
   },
   login (email, password) {
     return $http.post('/user/login', { email, password })

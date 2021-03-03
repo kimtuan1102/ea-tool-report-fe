@@ -9,6 +9,52 @@
         cols="12"
         md="12"
       >
+        <v-row>
+          <v-col
+            cols="12"
+            md="4"
+          >
+            <v-text-field
+              v-model="accountIdSearch"
+              label="Accout ID"
+              solo
+              clearable
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            md="4"
+          >
+            <v-text-field
+              v-model="telegramSearch"
+              label="Telegram"
+              solo
+              clearable
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            md="4"
+          >
+            <v-spacer />
+            <v-btn
+              color="success"
+              style="text-transform: none"
+              height="48"
+              @click="getAllReportData"
+            >
+              <v-icon left>
+                mdi-magnify
+              </v-icon>
+              Search
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-col>
+      <v-col
+        cols="12"
+        md="12"
+      >
         <material-card
           color="orange"
           full-header
@@ -156,6 +202,7 @@
   import { mapActions, mapState } from 'vuex'
   import AppService from '../services/app.service'
   import ReportAction from '../layouts/default/widgets/ReportAction'
+  import { mapFields } from 'vuex-map-fields'
 
   const lineSmooth = Vue.chartist.Interpolation.cardinal({
     tension: 0,
@@ -316,6 +363,7 @@
       sales: get('sales/sales'),
       ...mapState('report', ['reportData']),
       ...mapState('auth', ['userProfile']),
+      ...mapFields('report', ['accountIdSearch', 'telegramSearch']),
       totalSales () {
         return this.sales.reduce((acc, val) => acc + val.salesInM, 0)
       },
@@ -354,9 +402,6 @@
           doLa = (balance1 - balance0 - 200) * 0.15
         }
         return Math.ceil(doLa)
-      },
-      reportExcels () {
-        AppService.reportExcels()
       },
     },
     mounted () {

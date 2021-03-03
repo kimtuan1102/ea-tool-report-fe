@@ -1,7 +1,10 @@
 import AppService from '../../services/app.service'
 import Vue from 'vue'
+import { getField, updateField } from 'vuex-map-fields'
 const state = () => ({
   reportData: [],
+  accountIdSearch: '',
+  telegramSearch: '',
 })
 const mutations = {
   setReportData (state, data) {
@@ -11,11 +14,14 @@ const mutations = {
     const idx = state.reportData.findIndex(o => o._id === report._id)
     Vue.set(state.reportData, idx, report)
   },
+  updateField,
 }
 const actions = {
-  getAllReportData (context) {
-    AppService.getAllReport().then(res => {
-      context.commit('setReportData', res.data)
+  getAllReportData ({ commit, state }) {
+    const accountId = state.accountIdSearch
+    const telegram = state.telegramSearch
+    AppService.getReports({ accountId, telegram }).then(res => {
+      commit('setReportData', res.data)
     })
   },
   updateReportFields (context, { accountId, initialBalance, telegram, deposit, withdraw }) {
@@ -28,8 +34,15 @@ const actions = {
       context.dispatch('getAllReportData')
     })
   },
+  reportExcels ({ commit, state }) {
+    const accountId = state.accountIdSearch
+    const telegram = state.telegramSearch
+    AppService.reportExcels({ accountId, telegram })
+  },
 }
-const getters = {}
+const getters = {
+  getField,
+}
 
 export default {
   namespaced: true,

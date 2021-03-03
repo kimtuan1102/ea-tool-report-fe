@@ -53,11 +53,9 @@
 
 <script>
   import { mapActions, mapState } from 'vuex'
-  import AppService from '@/services/app.service'
 
   export default {
     name: 'ReportAction',
-
     data: () => ({
       items: [
         { title: 'Reset', icon: 'mdi-autorenew' },
@@ -69,10 +67,7 @@
     },
     methods: {
       ...mapActions('auth', ['logout', 'getProfile']),
-      ...mapActions('report', ['resetReportData']),
-      reportExcels () {
-        AppService.reportExcels()
-      },
+      ...mapActions('report', ['resetReportData', 'reportExcels']),
       clickAction (item) {
         switch (item.title) {
           case 'Reset':
