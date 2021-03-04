@@ -55,9 +55,6 @@
               :headers="headers"
               :items="reportData"
             >
-              <template #item.expireOn="{ item }">
-                <span>{{ item.expireDate | moment("DD/MM/YYYY") }}</span>
-              </template>
               <template #item.action="{ item }">
                 <div style="display: flex">
                   <v-icon
@@ -289,7 +286,7 @@
         {
           sortable: false,
           text: 'Hết hạn',
-          value: 'expireOn',
+          value: 'expireDateFormat',
         },
         {
           sortable: false,
