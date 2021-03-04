@@ -3,7 +3,7 @@ import Vue from 'vue'
 import { getField, updateField } from 'vuex-map-fields'
 const state = () => ({
   reportData: [],
-  filterType: '',
+  filterType: 'All',
   messageTelegram: '',
 })
 const mutations = {

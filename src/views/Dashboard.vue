@@ -293,6 +293,7 @@
         },
       ],
       searchItems: [
+        { id: 1, name: 'Tất cả', value: 'All' },
         { id: 1, name: 'Tài khoản sắp hết hạn ( 7 ngày )', value: 'ExpireLessThanSevenDay' },
         { id: 2, name: 'Tài tự đánh 1 lần', value: 'SelfOrderOneTime' },
         { id: 3, name: 'Tài tự đánh 2 lần', value: 'SelfOrderTwoTime' },
