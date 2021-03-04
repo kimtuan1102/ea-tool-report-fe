@@ -60,14 +60,19 @@
       items: [
         { title: 'Reset', icon: 'mdi-autorenew' },
         { title: 'Report', icon: 'mdi-file-excel' },
+        { title: 'Send Message', icon: 'mdi-email-send-outline' },
       ],
     }),
     computed: {
       ...mapState('auth', ['userProfile']),
     },
+    mounted () {
+      this.getProfile()
+    },
     methods: {
       ...mapActions('auth', ['logout', 'getProfile']),
       ...mapActions('report', ['resetReportData', 'reportExcels']),
+      ...mapActions('dialog', ['openDialogSendMessageTelegram']),
       clickAction (item) {
         switch (item.title) {
           case 'Reset':
@@ -76,13 +81,13 @@
           case 'Report':
             this.reportExcels()
             break
+          case 'Send Message':
+            this.openDialogSendMessageTelegram()
+            break
           default:
             break
         }
       },
-    },
-    mounted () {
-      this.getProfile()
     },
   }
 </script>

@@ -5,7 +5,8 @@
     <default-drawer v-if="isShowAppBarAndDrawer" />
 
     <default-view />
-
+    <default-dialog />
+    <default-loading />
     <default-footer v-if="isShowAppBarAndDrawer" />
   </v-app>
 </template>
@@ -35,6 +36,13 @@
         /* webpackChunkName: "default-view" */
         './View'
       ),
+      DefaultDialog: () => import(
+        /* webpackChunkName: "default-dialog" */
+        './Dialog'
+        ),
+      DefaultLoading: () => import(
+        './Loading'
+        ),
     },
     computed: {
       isShowAppBarAndDrawer () {

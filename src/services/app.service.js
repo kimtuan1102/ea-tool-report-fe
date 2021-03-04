@@ -8,19 +8,22 @@ const AppService = {
     const queryStr = UtilsService.buildQuery(params)
     return $http.get(`/copy/reports?${queryStr}`)
   },
-  updateReportFields (accountId, initialBalance, zalo, deposit, withdraw, expireDate) {
-    return $http.post('/copy/update-report-fields',
-      {
-        accountId: accountId, initialBalance: initialBalance, zalo: zalo, deposit: deposit, withdraw: withdraw, expireDate: expireDate,
-      })
+  updateReportFields (updateData) {
+    return $http.post('/copy/update-report-fields', updateData)
   },
   resetReportData () {
     return $http.post('/copy/reset-report-data')
   },
   reportExcels (params) {
     const queryStr = UtilsService.buildQuery(params)
-    console.log(queryStr)
     window.location.href = `/copy/excels-report-data?${queryStr}`
+  },
+  sendMessageToTelegram (params, sendMessageData) {
+    const queryStr = UtilsService.buildQuery(params)
+    return $http.post(`/copy/send-message-telegram?${queryStr}`, sendMessageData)
+  },
+  deleteReportByAccountId (accountId) {
+    return $http.delete(`/copy/delete-report/${accountId}`)
   },
   login (email, password) {
     return $http.post('/user/login', { email, password })

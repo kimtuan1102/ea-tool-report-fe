@@ -12,33 +12,16 @@
         <v-row>
           <v-col
             cols="12"
-            md="3"
+            md="4"
           >
             <v-select
-              v-model="searchItemSelected"
+              v-model="filterType"
               :items="searchItems"
               label="Search"
               item-text="name"
-              item-value="id"
+              item-value="value"
               solo
             />
-          </v-col>
-          <v-col
-            cols="12"
-            md="4"
-          >
-            <v-spacer />
-            <v-btn
-              color="success"
-              style="text-transform: none"
-              height="48"
-              @click="getAllReportData"
-            >
-              <v-icon left>
-                mdi-magnify
-              </v-icon>
-              Search
-            </v-btn>
           </v-col>
         </v-row>
       </v-col>
@@ -73,12 +56,20 @@
               :items="reportData"
             >
               <template #item.action="{ item }">
-                <v-icon
-                  class="mx-1"
-                  @click="openDialog(item)"
-                >
-                  mdi-pencil
-                </v-icon>
+                <div style="display: flex">
+                  <v-icon
+                    class="mx-1"
+                    @click="openDialog(item)"
+                  >
+                    mdi-pencil
+                  </v-icon>
+                  <v-icon
+                    class="mx-1"
+                    @click="deleteReportByAccountId({accountId: item.accountId})"
+                  >
+                    mdi-trash-can-outline
+                  </v-icon>
+                </div>
               </template>
             </v-data-table>
           </v-card-text>
@@ -122,13 +113,13 @@
               @blur="$v.initialBalance.$touch()"
             />
             <v-text-field
-              v-model="zalo"
+              v-model="telegram"
               color="purple"
-              :error-messages="zaloErrors"
+              :error-messages="telegramErrors"
               required
-              label="Zalo"
-              @input="$v.zalo.$touch()"
-              @blur="$v.zalo.$touch()"
+              label="Telegram"
+              @input="$v.telegram.$touch()"
+              @blur="$v.telegram.$touch()"
             />
             <v-text-field
               v-model="deposit"
@@ -176,6 +167,15 @@
                 @input="menu1 = false"
               />
             </v-menu>
+            <v-text-field
+              v-model="phone"
+              color="purple"
+              :error-messages="phoneErrors"
+              required
+              label="Phone number"
+              @input="$v.phone.$touch()"
+              @blur="$v.phone.$touch()"
+            />
             <v-btn
               class="mt-6"
               color="info"
@@ -212,19 +212,21 @@
     mixins: [validationMixin],
     validations: {
       initialBalance: { required },
-      zalo: { required },
+      telegram: { required },
       deposit: { required },
       withdraw: { required },
       expireDate: { required },
+      phone: { required },
     },
     data: (vm) => ({
       dateFormatted: vm.formatDate(new Date().toISOString().substr(0, 10)),
       dialogEdit: false,
       accountId: '',
       initialBalance: '',
-      zalo: '',
+      telegram: '',
       deposit: '',
       withdraw: '',
+      phone: '',
       expireDate: new Date().toISOString().substr(0, 10),
       menu1: false,
       searchItemSelected: '',
@@ -265,11 +267,6 @@
           value: 'selfOrder',
         },
         {
-          sortable: false,
-          text: 'Zalo',
-          value: 'zalo',
-        },
-        {
           sortable: true,
           text: 'Deposit',
           value: 'deposit',
@@ -281,15 +278,25 @@
         },
         {
           sortable: false,
+          text: 'Telegram',
+          value: 'telegram',
+        },
+        {
+          sortable: false,
+          text: 'Phone',
+          value: 'phone',
+        },
+        {
+          sortable: false,
           text: 'Action',
           value: 'action',
         },
       ],
       searchItems: [
-        { id: 1, name: 'Tài khoản sắp hết hạn ( 7 ngày )' },
-        { id: 2, name: 'Tài tự đánh 1 lần' },
-        { id: 3, name: 'Tài tự đánh 2 lần' },
-        { id: 4, name: 'Tài tự đánh nhiều hơn 2 lần' },
+        { id: 1, name: 'Tài khoản sắp hết hạn ( 7 ngày )', value: 'ExpireLessThanSevenDay' },
+        { id: 2, name: 'Tài tự đánh 1 lần', value: 'SelfOrderOneTime' },
+        { id: 3, name: 'Tài tự đánh 2 lần', value: 'SelfOrderTwoTime' },
+        { id: 4, name: 'Tài tự đánh nhiều hơn 2 lần', value: 'SelfOrderMoreThanTwoTime' },
       ],
     }),
 
@@ -297,7 +304,7 @@
       sales: get('sales/sales'),
       ...mapState('report', ['reportData']),
       ...mapState('auth', ['userProfile']),
-      ...mapFields('report', ['accountIdSearch', 'zaloSearch']),
+      ...mapFields('report', ['filterType']),
       computedDateFormatted () {
         return this.formatDate(this.date)
       },
@@ -307,10 +314,10 @@
         !this.$v.initialBalance.required && errors.push('Initial Balance is required')
         return errors
       },
-      zaloErrors () {
+      telegramErrors () {
         const errors = []
-        if (!this.$v.zalo.$dirty) return errors
-        !this.$v.zalo.required && errors.push('Zalo is required')
+        if (!this.$v.telegram.$dirty) return errors
+        !this.$v.telegram.required && errors.push('Telegram is required')
         return errors
       },
       depositErrors () {
@@ -331,29 +338,37 @@
         !this.$v.expireDate.required && errors.push('Expire date is required')
         return errors
       },
+      phoneErrors () {
+        const errors = []
+        if (!this.$v.phone.$dirty) return errors
+        !this.$v.phone.required && errors.push('Phone number is required')
+        return errors
+      },
     },
     methods: {
-      ...mapActions('report', ['getAllReportData', 'updateReportFields', 'resetReportData']),
+      ...mapActions('report', ['getAllReportData', 'updateReportFields', 'resetReportData', 'deleteReportByAccountId']),
       ...mapActions('auth', ['getProfile']),
       openDialog (item) {
         this.accountId = item.accountId
         this.initialBalance = item.initialBalance
-        this.zalo = item.zalo
+        this.telegram = item.telegram
         this.deposit = item.deposit
         this.withdraw = item.withdraw
         this.expireDate = new Date(item.expireDate).toISOString().substr(0, 10)
+        this.phone = item.phone
         this.dialogEdit = true
       },
       updateData () {
         const accountId = this.accountId
         const initialBalance = this.initialBalance
-        const zalo = this.zalo
+        const telegram = this.telegram
         const deposit = this.deposit
         const withdraw = this.withdraw
         const expireDate = this.expireDate
+        const phone = this.phone
         this.$v.$touch()
         if (this.$v.$error) return
-        this.updateReportFields({ accountId, initialBalance, zalo, deposit, withdraw, expireDate })
+        this.updateReportFields({ accountId, initialBalance, telegram, deposit, withdraw, expireDate, phone })
         this.dialogEdit = false
       },
       doLaCalc (item) {
@@ -388,7 +403,7 @@
       expireDate (val) {
         this.dateFormatted = this.formatDate(this.expireDate)
       },
-      searchItemSelected () {
+      filterType () {
         this.getAllReportData()
       },
     },
