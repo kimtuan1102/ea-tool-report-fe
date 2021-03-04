@@ -55,6 +55,9 @@
               :headers="headers"
               :items="reportData"
             >
+              <template #item.expireOn="{ item }">
+                <span>{{ item.expireDate | moment("DD/MM/YYYY") }}</span>
+              </template>
               <template #item.action="{ item }">
                 <div style="display: flex">
                   <v-icon
@@ -196,15 +199,12 @@
 <script>
   // Utilities
   import { get } from 'vuex-pathify'
-  import Vue from 'vue'
   import { mapActions, mapState } from 'vuex'
   import ReportAction from '../layouts/default/widgets/ReportAction'
   import { mapFields } from 'vuex-map-fields'
   import { validationMixin } from 'vuelidate'
-  import { required, email } from 'vuelidate/lib/validators'
-  const lineSmooth = Vue.chartist.Interpolation.cardinal({
-    tension: 0,
-  })
+  import { required } from 'vuelidate/lib/validators'
+  import * as moment from 'moment'
 
   export default {
     name: 'DashboardView',
@@ -288,6 +288,11 @@
         },
         {
           sortable: false,
+          text: 'Hết hạn',
+          value: 'expireOn',
+        },
+        {
+          sortable: false,
           text: 'Action',
           value: 'action',
         },
@@ -346,9 +351,24 @@
         return errors
       },
     },
+    watch: {
+      expireDate (val) {
+        this.dateFormatted = this.formatDate(this.expireDate)
+      },
+      filterType () {
+        this.getAllReportData()
+      },
+    },
+    mounted () {
+      this.getProfile()
+      this.getAllReportData()
+    },
     methods: {
       ...mapActions('report', ['getAllReportData', 'updateReportFields', 'resetReportData', 'deleteReportByAccountId']),
       ...mapActions('auth', ['getProfile']),
+      formatDate (date) {
+        return moment(date).format('DD/MM/YYYY')
+      },
       openDialog (item) {
         this.accountId = item.accountId
         this.initialBalance = item.initialBalance
@@ -372,45 +392,12 @@
         this.updateReportFields({ accountId, initialBalance, telegram, deposit, withdraw, expireDate, phone })
         this.dialogEdit = false
       },
-      doLaCalc (item) {
-        const balance0 = item.initialBalance
-        const balance1 = item.currentBalance
-        let doLa = 0
-        if (balance0 < 7000 && balance1 > balance0) {
-          doLa = (balance1 - balance0 - 50) * 0.15
-        } else if (balance0 >= 7000 && balance0 < 10000 && balance1 > balance0) {
-          doLa = (balance1 - balance0 - 100) * 0.15
-        } else if (balance0 >= 10000 && balance0 < 20000 && balance1 > balance0) {
-          doLa = (balance1 - balance0 - 150) * 0.15
-        } else if (balance0 >= 20000 && balance1 > balance0) {
-          doLa = (balance1 - balance0 - 200) * 0.15
-        }
-        return Math.ceil(doLa)
-      },
-      formatDate (date) {
-        if (!date) return null
-
-        const [year, month, day] = date.split('-')
-        return `${month}/${day}/${year}`
-      },
       parseDate (date) {
         if (!date) return null
 
         const [month, day, year] = date.split('/')
         return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
       },
-    },
-    watch: {
-      expireDate (val) {
-        this.dateFormatted = this.formatDate(this.expireDate)
-      },
-      filterType () {
-        this.getAllReportData()
-      },
-    },
-    mounted () {
-      this.getProfile()
-      this.getAllReportData()
     },
   }
 </script>

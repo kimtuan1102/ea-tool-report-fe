@@ -52,7 +52,8 @@
 <style lang="sass">
   .v-alert--material
     margin-top: 32px
-
+    z-index: 1000
+    top: 10px
     .v-alert__dismissible
       align-self: flex-start
       margin: 0 0 0 16px !important

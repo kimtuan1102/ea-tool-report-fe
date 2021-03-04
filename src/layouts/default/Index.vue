@@ -1,13 +1,12 @@
 <template>
   <v-app>
     <default-bar v-if="isShowAppBarAndDrawer" />
-
     <default-drawer v-if="isShowAppBarAndDrawer" />
-
     <default-view />
     <default-dialog />
     <default-loading />
     <default-footer v-if="isShowAppBarAndDrawer" />
+    <vue-confirm-dialog></vue-confirm-dialog>
   </v-app>
 </template>
 
