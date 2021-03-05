@@ -61,7 +61,6 @@
         { title: 'Reset', icon: 'mdi-autorenew' },
         { title: 'Report', icon: 'mdi-file-excel' },
         { title: 'Send Message', icon: 'mdi-email-send-outline' },
-        { title: 'Sync Telegram', icon: 'mdi-head-sync-outline' },
       ],
     }),
     computed: {
@@ -72,7 +71,7 @@
     },
     methods: {
       ...mapActions('auth', ['logout', 'getProfile']),
-      ...mapActions('report', ['resetReportData', 'reportExcels', 'syncTelegramAccount']),
+      ...mapActions('report', ['resetReportData', 'reportExcels']),
       ...mapActions('dialog', ['openDialogSendMessageTelegram']),
       clickAction (item) {
         switch (item.title) {
@@ -84,9 +83,6 @@
             break
           case 'Send Message':
             this.openDialogSendMessageTelegram()
-            break
-          case 'Sync Telegram':
-            this.syncTelegramAccount()
             break
           default:
             break

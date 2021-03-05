@@ -132,20 +132,6 @@ const actions = {
     _msg = _msg + `{${key}}`
     commit('setTelegramMessage', _msg)
   },
-  async syncTelegramAccount ({ dispatch }) {
-    dispatch('loading/openLoading', null, { root: true })
-    const filterType = state.filterType
-    const accountId = state.accountIdSearch
-    try {
-      await AppService.syncTelegramAccount()
-      await AppService.filterReports({ filterType, accountId })
-      Vue.$toast.success('Sync telegram account success')
-    } catch (e) {
-      Vue.$toast.error('Sync telegram account Failed')
-    } finally {
-      dispatch('loading/closeLoading', null, { root: true })
-    }
-  },
 }
 const getters = {
   getField,

@@ -25,9 +25,6 @@ const AppService = {
   deleteReportByAccountId (accountId) {
     return $http.delete(`/copy/delete-report/${accountId}`)
   },
-  syncTelegramAccount () {
-    return $http.get('/telegram/sync-telegram-account')
-  },
   login (email, password) {
     return $http.post('/user/login', { email, password })
   },
