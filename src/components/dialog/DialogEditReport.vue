@@ -5,7 +5,7 @@
   >
     <v-card>
       <v-card-title>
-        Edit Balance 0?
+        Sửa thông tin tài khoản
 
         <v-spacer />
 
