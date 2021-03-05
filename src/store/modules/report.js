@@ -24,6 +24,9 @@ const mutations = {
     const idx = state.reportData.findIndex(o => o._id === report._id)
     Vue.set(state.reportData, idx, report)
   },
+  setTelegramMessage (state, message) {
+    state.messageTelegram = message
+  },
   removeReport (state, report) {
     const idx = state.reportData.findIndex(o => o._id === report._id)
     Vue.delete(state.reportData, idx)
@@ -122,6 +125,12 @@ const actions = {
   },
   bindReportForm ({ commit }, report) {
     commit('setFieldEdit', report)
+  },
+  pushDynamicKeys ({ commit, state }, key) {
+    let _msg = state.messageTelegram
+    if (!_msg) _msg = ''
+    _msg = _msg + `{${key}}`
+    commit('setTelegramMessage', _msg)
   },
 }
 const getters = {

@@ -46,9 +46,9 @@
                 default
                 rounded
                 style="text-transform: none"
-                @click="messageTelegram = messageTelegram + `{${item.key}}`"
+                @click="pushDynamicKeys(item.key)"
               >
-                {{item.text}}
+                {{ item.text }}
               </v-btn>
             </v-col>
             <v-col
@@ -100,7 +100,7 @@
     },
     methods: {
       ...mapActions('dialog', ['closeDialogSendMessageTelegram']),
-      ...mapActions('report', ['sendMessageToTelegram']),
+      ...mapActions('report', ['sendMessageToTelegram', 'pushDynamicKeys']),
     },
   }
 </script>
