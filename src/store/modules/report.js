@@ -132,6 +132,19 @@ const actions = {
     _msg = _msg + `{${key}}`
     commit('setTelegramMessage', _msg)
   },
+  syncTelegramAccount ({ dispatch }) {
+    dispatch('loading/openLoading', null, { root: true })
+    AppService.syncTelegramAccount()
+      .then(() => {
+        Vue.$toast.success('Sync telegram account success')
+      })
+      .catch(() => {
+        Vue.$toast.error('Sync telegram account Failed')
+      })
+      .finally(() => {
+        dispatch('loading/closeLoading', null, { root: true })
+      })
+  },
 }
 const getters = {
   getField,
