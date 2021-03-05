@@ -26,7 +26,7 @@
             >
               <v-textarea
                 v-model="messageTelegram"
-                name="input-7-1"
+                clearable
                 solo
                 label="Nội dung"
                 value="Xin Chào"
@@ -38,125 +38,17 @@
               md="12"
             >
               <v-btn
+                v-for="item of dynamicKeys"
+                :key="item.id"
                 class="mx-1 my-1"
                 color="#d3d3d3"
                 depressed
                 default
                 rounded
                 style="text-transform: none"
-                @click="messageTelegram = messageTelegram + '{accountId}'"
+                @click="messageTelegram = messageTelegram + `{${item.key}}`"
               >
-                ID
-              </v-btn>
-              <v-btn
-                class="mx-1 my-1"
-                color="#d3d3d3"
-                depressed
-                default
-                rounded
-                style="text-transform: none"
-                @click="messageTelegram = messageTelegram + '{initialBalance}'"
-              >
-                Balance 0
-              </v-btn>
-              <v-btn
-                class="mx-1 my-1"
-                color="#d3d3d3"
-                depressed
-                default
-                rounded
-                style="text-transform: none"
-                @click="messageTelegram = messageTelegram + '{currentBalance}'"
-              >
-                Balance 1
-              </v-btn>
-              <v-btn
-                class="mx-1 my-1"
-                color="#d3d3d3"
-                depressed
-                default
-                rounded
-                style="text-transform: none"
-                @click="messageTelegram = messageTelegram + '{percent}'"
-              >
-                Phần trăm
-              </v-btn>
-              <v-btn
-                class="mx-1 my-1"
-                color="#d3d3d3"
-                depressed
-                default
-                rounded
-                style="text-transform: none"
-                @click="messageTelegram = messageTelegram + '{dollar}'"
-              >
-                Dollar
-              </v-btn>
-              <v-btn
-                class="mx-1 my-1"
-                color="#d3d3d3"
-                depressed
-                default
-                rounded
-                style="text-transform: none"
-                @click="messageTelegram = messageTelegram + '{botOrder}'"
-              >
-                Bot
-              </v-btn>
-              <v-btn
-                class="mx-1 my-1"
-                color="#d3d3d3"
-                depressed
-                default
-                rounded
-                style="text-transform: none"
-                @click="messageTelegram = messageTelegram + '{selfOrder}'"
-              >
-                Tự đánh
-              </v-btn>
-              <v-btn
-                class="mx-1 my-1"
-                color="#d3d3d3"
-                depressed
-                default
-                rounded
-                style="text-transform: none"
-                @click="messageTelegram = messageTelegram + '{deposit}'"
-              >
-                Deposit
-              </v-btn>
-              <v-btn
-                class="mx-1 my-1"
-                color="#d3d3d3"
-                depressed
-                default
-                rounded
-                style="text-transform: none"
-                @click="messageTelegram = messageTelegram + '{withdraw}'"
-              >
-                Withdraw
-              </v-btn>
-              <v-btn
-                class="mx-1 my-1"
-                color="#d3d3d3"
-                depressed
-                default
-                rounded
-                style="text-transform: none"
-                @click="messageTelegram = messageTelegram + '{expireDateFormat}'"
-              >
-                Hết hạn
-              </v-btn>
-              <v-btn
-                class="mx-1 my-1"
-                color="#d3d3d3"
-                depressed
-                default
-                rounded
-                style="text-transform: none"
-                @click="messageTelegram = messageTelegram + '{phone}'"
-              >
-                SDT
+                {{item.text}}
               </v-btn>
             </v-col>
             <v-col
@@ -187,6 +79,21 @@
 
   export default {
     name: 'DialogSendMessageTelegram',
+    data: () => ({
+      dynamicKeys: [
+        { id: 1, key: 'accountId', text: 'ID' },
+        { id: 2, key: 'initialBalance', text: 'Balance 0' },
+        { id: 3, key: 'currentBalance', text: 'Balance 1' },
+        { id: 4, key: 'percent', text: 'Phần trăm' },
+        { id: 5, key: 'dollar', text: 'Dollar' },
+        { id: 6, key: 'botOrder', text: 'Bot' },
+        { id: 7, key: 'selfOrder', text: 'Tự đánh' },
+        { id: 8, key: 'deposit', text: 'Deposit' },
+        { id: 9, key: 'withdraw', text: 'Withdraw' },
+        { id: 10, key: 'expireDateFormat', text: 'Hết hạn' },
+        { id: 11, key: 'phone', text: 'SĐT' },
+      ],
+    }),
     computed: {
       ...mapState('dialog', ['showDialogSendMessageTelegram']),
       ...mapFields('report', ['messageTelegram']),
@@ -199,5 +106,8 @@
 </script>
 
 <style scoped>
+  ::v-deep .v-text-field__slot {
+    margin-right: -46px !important;
+  }
 
 </style>

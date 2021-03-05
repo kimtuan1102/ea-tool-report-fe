@@ -6,7 +6,7 @@ const state = () => ({
   reportData: [],
   filterType: '',
   accountIdSearch: '',
-  messageTelegram: '',
+  messageTelegram: 'Chào bạn',
 //  Edit field
   accountId: '',
   initialBalance: '',
