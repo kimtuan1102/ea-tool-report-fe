@@ -1,6 +1,7 @@
 import { getField, updateField } from 'vuex-map-fields'
 const state = () => ({
   showDialogSendMessageTelegram: false,
+  showDialogEditReport: false,
 })
 const mutations = {
   setDialog (state, data) {
@@ -18,6 +19,13 @@ const actions = {
   },
   closeDialogSendMessageTelegram ({ commit }) {
     commit('setDialog', { showDialogSendMessageTelegram: false })
+  },
+  openDialogEditReport ({ commit, dispatch }, report) {
+    dispatch('report/bindReportForm', report, { root: true })
+    commit('setDialog', { showDialogEditReport: true })
+  },
+  closeDialogEditReport ({ commit }) {
+    commit('setDialog', { showDialogEditReport: false })
   },
 }
 const getters = {

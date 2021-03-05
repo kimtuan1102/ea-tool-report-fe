@@ -1,10 +1,20 @@
 import AppService from '../../services/app.service'
 import Vue from 'vue'
 import { getField, updateField } from 'vuex-map-fields'
+import * as moment from 'moment'
 const state = () => ({
   reportData: [],
-  filterType: 'All',
+  filterType: '',
+  accountIdSearch: '',
   messageTelegram: '',
+//  Edit field
+  accountId: '',
+  initialBalance: '',
+  telegram: '',
+  deposit: '',
+  withdraw: '',
+  expireDate: new Date().toISOString().substr(0, 10),
+  phone: '',
 })
 const mutations = {
   setReportData (state, data) {
@@ -18,13 +28,21 @@ const mutations = {
     const idx = state.reportData.findIndex(o => o._id === report._id)
     Vue.delete(state.reportData, idx)
   },
+  setFieldEdit (state, report) {
+    if (typeof report === 'object') {
+      for (const propName in report) {
+        state[propName] = report[propName]
+      }
+    }
+  },
   updateField,
 }
 const actions = {
-  getAllReportData ({ commit, state, dispatch }) {
+  filterReports ({ commit, state, dispatch }) {
     const filterType = state.filterType
+    const accountId = state.accountIdSearch
     dispatch('loading/openLoading', null, { root: true })
-    AppService.getReports({ filterType })
+    AppService.filterReports({ filterType, accountId })
       .then(res => {
       commit('setReportData', res.data)
     }).catch(() => {
@@ -38,6 +56,10 @@ const actions = {
     context.dispatch('loading/openLoading', null, { root: true })
     AppService.updateReportFields(updateData)
       .then(res => {
+        const report = res.data
+        report.expireDateFormat = moment(report.expireDate).format(
+          'DD/MM/YYYY',
+        )
       context.commit('updateReport', res.data)
       Vue.$toast.success('Update Success')
     })
@@ -46,6 +68,7 @@ const actions = {
       })
       .finally(() => {
         context.dispatch('loading/closeLoading', null, { root: true })
+        context.dispatch('dialog/closeDialogEditReport', null, { root: true })
       })
   },
   resetReportData (context) {
@@ -96,6 +119,9 @@ const actions = {
           },
         },
       )
+  },
+  bindReportForm ({ commit }, report) {
+    commit('setFieldEdit', report)
   },
 }
 const getters = {

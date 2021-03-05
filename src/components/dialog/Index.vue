@@ -1,6 +1,7 @@
 <template>
   <div>
     <dialog-send-message-telegram />
+    <dialog-edit-report />
   </div>
 </template>
 
@@ -12,6 +13,10 @@
         /* webpackChunkName: "dialog-send-message-telegram" */
         './DialogSendMessageTelegram'
         ),
+      DialogEditReport: () => import(
+        /* webpackChunkName: "dialog-edit-report" */
+        './DialogEditReport'
+      ),
     },
   }
 </script>

@@ -14,14 +14,42 @@
             cols="12"
             md="4"
           >
+            <v-text-field
+              v-model="accountIdSearch"
+              label="ID tài khoản"
+              solo
+              clearable
+            />
+          </v-col>
+          <v-col
+            cols="12"
+            md="4"
+          >
             <v-select
               v-model="filterType"
               :items="searchItems"
-              label="Search"
+              label="Tiêu chí"
               item-text="name"
               item-value="value"
               solo
             />
+          </v-col>
+          <v-col
+            cols="12"
+            md="4"
+          >
+            <v-btn
+              height="48"
+              style="text-transform: none"
+              depressed
+              color="primary"
+              @click="filterReports"
+            >
+              <v-icon left>
+                mdi-magnify
+              </v-icon>
+              Search
+            </v-btn>
           </v-col>
         </v-row>
       </v-col>
@@ -59,7 +87,7 @@
                 <div style="display: flex">
                   <v-icon
                     class="mx-1"
-                    @click="openDialog(item)"
+                    @click="openDialogEditReport(item)"
                   >
                     mdi-pencil
                   </v-icon>
@@ -76,120 +104,6 @@
         </material-card>
       </v-col>
     </v-row>
-    <v-dialog
-      v-model="dialogEdit"
-      max-width="500"
-    >
-      <v-card>
-        <v-card-title>
-          Edit Balance 0?
-
-          <v-spacer />
-
-          <v-icon
-            aria-label="Close"
-            @click="dialogEdit = false"
-          >
-            mdi-close
-          </v-icon>
-        </v-card-title>
-
-        <v-card-text class="text-body-1 text-center">
-          <v-form>
-            <v-text-field
-              v-model="accountId"
-              disabled
-              label="Account ID"
-            />
-            <v-text-field
-              v-model="initialBalance"
-              prefix="$"
-              color="purple"
-              type="number"
-              :error-messages="initialBalanceErrors"
-              required
-              label="Initial Balance"
-              @input="$v.initialBalance.$touch()"
-              @blur="$v.initialBalance.$touch()"
-            />
-            <v-text-field
-              v-model="telegram"
-              color="purple"
-              :error-messages="telegramErrors"
-              required
-              label="Telegram"
-              @input="$v.telegram.$touch()"
-              @blur="$v.telegram.$touch()"
-            />
-            <v-text-field
-              v-model="deposit"
-              color="purple"
-              :error-messages="depositErrors"
-              required
-              type="number"
-              label="Deposit"
-              @input="$v.deposit.$touch()"
-              @blur="$v.deposit.$touch()"
-            />
-            <v-text-field
-              v-model="withdraw"
-              color="purple"
-              type="number"
-              :error-messages="withdrawErrors"
-              required
-              label="Withdraw"
-              @input="$v.withdraw.$touch()"
-              @blur="$v.withdraw.$touch()"
-            />
-            <v-menu
-              ref="menu1"
-              v-model="menu1"
-              :close-on-content-click="false"
-              transition="scale-transition"
-              offset-y
-              max-width="290px"
-              min-width="auto"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  v-model="dateFormatted"
-                  label="Expire Date"
-                  hint="MM/DD/YYYY format"
-                  persistent-hint
-                  v-bind="attrs"
-                  @blur="date = parseDate(dateFormatted)"
-                  v-on="on"
-                />
-              </template>
-              <v-date-picker
-                v-model="expireDate"
-                no-title
-                @input="menu1 = false"
-              />
-            </v-menu>
-            <v-text-field
-              v-model="phone"
-              color="purple"
-              :error-messages="phoneErrors"
-              required
-              label="Phone number"
-              @input="$v.phone.$touch()"
-              @blur="$v.phone.$touch()"
-            />
-            <v-btn
-              class="mt-6"
-              color="info"
-              depressed
-              default
-              rounded
-              @click="updateData"
-            >
-              Update
-            </v-btn>
-          </v-form>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
   </v-container>
 </template>
 
@@ -201,7 +115,6 @@
   import { mapFields } from 'vuex-map-fields'
   import { validationMixin } from 'vuelidate'
   import { required } from 'vuelidate/lib/validators'
-  import * as moment from 'moment'
 
   export default {
     name: 'DashboardView',
@@ -216,17 +129,6 @@
       phone: { required },
     },
     data: (vm) => ({
-      dateFormatted: vm.formatDate(new Date().toISOString().substr(0, 10)),
-      dialogEdit: false,
-      accountId: '',
-      initialBalance: '',
-      telegram: '',
-      deposit: '',
-      withdraw: '',
-      phone: '',
-      expireDate: new Date().toISOString().substr(0, 10),
-      menu1: false,
-      searchItemSelected: '',
       headers: [
         {
           sortable: true,
@@ -307,94 +209,21 @@
       sales: get('sales/sales'),
       ...mapState('report', ['reportData']),
       ...mapState('auth', ['userProfile']),
-      ...mapFields('report', ['filterType']),
-      computedDateFormatted () {
-        return this.formatDate(this.date)
-      },
-      initialBalanceErrors () {
-        const errors = []
-        if (!this.$v.initialBalance.$dirty) return errors
-        !this.$v.initialBalance.required && errors.push('Initial Balance is required')
-        return errors
-      },
-      telegramErrors () {
-        const errors = []
-        if (!this.$v.telegram.$dirty) return errors
-        !this.$v.telegram.required && errors.push('Telegram is required')
-        return errors
-      },
-      depositErrors () {
-        const errors = []
-        if (!this.$v.deposit.$dirty) return errors
-        !this.$v.deposit.required && errors.push('Deposit is required')
-        return errors
-      },
-      withdrawErrors () {
-        const errors = []
-        if (!this.$v.withdraw.$dirty) return errors
-        !this.$v.withdraw.required && errors.push('Withdraw is required')
-        return errors
-      },
-      expireDateErrors () {
-        const errors = []
-        if (!this.$v.expireDate.$dirty) return errors
-        !this.$v.expireDate.required && errors.push('Expire date is required')
-        return errors
-      },
-      phoneErrors () {
-        const errors = []
-        if (!this.$v.phone.$dirty) return errors
-        !this.$v.phone.required && errors.push('Phone number is required')
-        return errors
-      },
+      ...mapFields('report', ['filterType', 'accountIdSearch']),
     },
     watch: {
-      expireDate (val) {
-        this.dateFormatted = this.formatDate(this.expireDate)
-      },
       filterType () {
-        this.getAllReportData()
+        this.filterReports()
       },
     },
     mounted () {
       this.getProfile()
-      this.getAllReportData()
+      this.filterReports()
     },
     methods: {
-      ...mapActions('report', ['getAllReportData', 'updateReportFields', 'resetReportData', 'deleteReportByAccountId']),
+      ...mapActions('report', ['filterReports', 'updateReportFields', 'resetReportData', 'deleteReportByAccountId']),
       ...mapActions('auth', ['getProfile']),
-      formatDate (date) {
-        return moment(date).format('DD/MM/YYYY')
-      },
-      openDialog (item) {
-        this.accountId = item.accountId
-        this.initialBalance = item.initialBalance
-        this.telegram = item.telegram
-        this.deposit = item.deposit
-        this.withdraw = item.withdraw
-        this.expireDate = new Date(item.expireDate).toISOString().substr(0, 10)
-        this.phone = item.phone
-        this.dialogEdit = true
-      },
-      updateData () {
-        const accountId = this.accountId
-        const initialBalance = this.initialBalance
-        const telegram = this.telegram
-        const deposit = this.deposit
-        const withdraw = this.withdraw
-        const expireDate = this.expireDate
-        const phone = this.phone
-        this.$v.$touch()
-        if (this.$v.$error) return
-        this.updateReportFields({ accountId, initialBalance, telegram, deposit, withdraw, expireDate, phone })
-        this.dialogEdit = false
-      },
-      parseDate (date) {
-        if (!date) return null
-
-        const [month, day, year] = date.split('/')
-        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
-      },
+      ...mapActions('dialog', ['openDialogEditReport']),
     },
   }
 </script>

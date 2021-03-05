@@ -4,7 +4,7 @@ import $const from '../common/const'
 import jwtDecode from 'jwt-decode'
 import UtilsService from './utils.service'
 const AppService = {
-  getReports (params) {
+  filterReports (params) {
     const queryStr = UtilsService.buildQuery(params)
     return $http.get(`/copy/reports?${queryStr}`)
   },
