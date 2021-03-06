@@ -83,13 +83,15 @@ const actions = {
   },
   reportExcels ({ commit, state }) {
     const filterType = state.filterType
-    AppService.reportExcels({ filterType })
+    const accountId = state.accountIdSearch
+    AppService.reportExcels({ filterType, accountId })
   },
   sendMessageToTelegram ({ commit, state, dispatch }) {
     const filterType = state.filterType
+    const accountId = state.accountIdSearch
     const messageTelegram = state.messageTelegram
     dispatch('loading/openLoading', null, { root: true })
-    AppService.sendMessageToTelegram({ filterType }, { message: messageTelegram })
+    AppService.sendMessageToTelegram({ filterType, accountId }, { message: messageTelegram })
       .then(res => {
       dispatch('dialog/closeDialogSendMessageTelegram', null, { root: true })
         Vue.$toast.success('Send message to telegram success')
