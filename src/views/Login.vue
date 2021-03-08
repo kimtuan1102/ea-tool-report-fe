@@ -41,14 +41,37 @@
                 @input="$v.$touch()"
                 @blur="$v.$touch()"
               />
+              <div
+                v-if="isWrongPassword"
+                class="err"
+              >
+                {{ `Tài khoản hoặc mật khẩu không đúng(${loginAttempts}/5)` }}
+              </div>
+              <div
+                v-if="isAccountDoesNotExist"
+                class="err"
+              >
+                Tài khoản không tồn tại
+              </div>
+              <div
+                v-if="isUserBlocked"
+                class="err"
+              >
+                Tài khoản bị khóa
+              </div>
               <v-btn
                 class="mt-6 accent--text"
                 rounded
                 light
                 large
                 text
+                :loading="loading"
+                :disabled="loading"
                 @click="submit"
               >
+                <template v-slot:loader>
+                  <span>Loading...</span>
+                </template>
                 LET'S GO
               </v-btn>
             </v-form>
@@ -60,7 +83,7 @@
 </template>
 
 <script>
-  import { mapActions } from 'vuex'
+  import { mapActions, mapState } from 'vuex'
   import { validationMixin } from 'vuelidate'
   import { required, email } from 'vuelidate/lib/validators'
 
@@ -76,6 +99,7 @@
       email: '',
     }),
     computed: {
+      ...mapState('auth', ['loading', 'isAccountDoesNotExist', 'isUserBlocked', 'isWrongPassword', 'loginAttempts']),
       passwordErrors () {
         const errors = []
         if (!this.$v.password.$dirty) return errors
@@ -107,6 +131,9 @@
   .bg {
     height: 100vh;
     background-image: url("../assets/login.jpg");
+  }
+  .err {
+    color: red;
   }
 
 </style>
