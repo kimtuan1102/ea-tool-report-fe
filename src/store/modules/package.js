@@ -136,6 +136,7 @@ const actions = {
     context.dispatch('loading/openLoading', null, { root: true })
     PackageService.extendPackage(context.state.extendPackage)
       .then(res => {
+        context.commit('report/updateReport', res.data, { root: true })
         Vue.$toast.success('Gia hạn thành công')
       })
       .catch(() => {
