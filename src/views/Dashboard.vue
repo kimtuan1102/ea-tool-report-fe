@@ -58,7 +58,7 @@
         md="12"
       >
         <material-card
-          color="orange"
+          color="primary"
           full-header
         >
           <template #heading>
@@ -87,15 +87,25 @@
                 <div style="display: flex">
                   <v-icon
                     class="mx-1"
+                    color="primary"
                     @click="openDialogEditReport(item)"
                   >
                     mdi-pencil
                   </v-icon>
                   <v-icon
                     class="mx-1"
+                    color="accent"
                     @click="deleteReportByAccountId({accountId: item.accountId})"
                   >
                     mdi-trash-can-outline
+                  </v-icon>
+                  <v-icon
+                    v-if="userProfile.roles.includes('admin')"
+                    class="mx-1"
+                    color="secondary"
+                    @click="openDialogExtendPackage({accountId: item.accountId})"
+                  >
+                    mdi-wallet-plus-outline
                   </v-icon>
                 </div>
               </template>
@@ -223,7 +233,7 @@
     methods: {
       ...mapActions('report', ['filterReports', 'updateReportFields', 'resetReportData', 'deleteReportByAccountId']),
       ...mapActions('auth', ['getProfile']),
-      ...mapActions('dialog', ['openDialogEditReport']),
+      ...mapActions('dialog', ['openDialogEditReport', 'openDialogExtendPackage']),
     },
   }
 </script>

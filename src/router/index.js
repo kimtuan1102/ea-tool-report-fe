@@ -23,6 +23,7 @@ const router = new Router({
   routes: [
     layout('Default', [
       route('Dashboard', null, '/', { requiresAuth: true }),
+      route('Settings', null, '/settings', { requiresAuth: true }),
       route('Login', null, '/login'),
     ]),
   ],
