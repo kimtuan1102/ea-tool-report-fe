@@ -9,7 +9,7 @@
       md="3"
     >
       <material-card
-        color="#e91e63"
+        color="primary"
         full-header
       >
         <template #heading>
@@ -42,7 +42,7 @@
                 @blur="$v.$touch()"
               />
               <v-btn
-                class="mt-6 accent--text"
+                class="mt-6 primary--text"
                 rounded
                 light
                 large
