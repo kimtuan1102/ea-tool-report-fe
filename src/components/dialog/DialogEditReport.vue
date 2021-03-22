@@ -102,7 +102,8 @@
           </v-menu>
           <v-btn
             class="mt-6"
-            color="info"
+            color="primary"
+            style="text-transform: none"
             depressed
             default
             rounded

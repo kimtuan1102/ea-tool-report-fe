@@ -12,6 +12,11 @@ const state = {
       icon: 'mdi-view-dashboard',
       to: '/',
     },
+    {
+      title: 'Settings',
+      icon: 'mdi-cog-outline',
+      to: '/settings',
+    },
   ],
 }
 
