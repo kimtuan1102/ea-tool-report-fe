@@ -131,6 +131,7 @@
   .bg {
     height: 100vh;
     background-image: url("../assets/login.jpg");
+    background-size: auto 100%;
   }
   .err {
     color: red;
