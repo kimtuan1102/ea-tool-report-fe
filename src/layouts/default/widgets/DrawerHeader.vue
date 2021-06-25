@@ -9,7 +9,7 @@
 
     <v-list-item-content class="pl-2">
       <v-list-item-title class="text-h3">
-        <strong class="mr-1 font-weight-black">EA</strong>
+        <strong class="mr-1 font-weight-black">AI</strong>
 
         <span class="primary--text">REPORT</span>
       </v-list-item-title>
