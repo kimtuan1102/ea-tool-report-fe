@@ -8,6 +8,7 @@
       <v-col cols="12">
         <v-fab-transition>
           <v-btn
+            v-if="userProfile.roles.includes('admin')"
             fab
             large
             bottom
@@ -33,6 +34,7 @@
         <material-stat-card v-bind="attrs">
           <template #actions>
             <v-btn
+              v-if="userProfile.roles.includes('admin')"
               text
               style="text-transform: none"
               @click="openDialogEditPackage(packages[i])"
@@ -46,6 +48,7 @@
               Sửa
             </v-btn>
             <v-btn
+              v-if="userProfile.roles.includes('admin')"
               text
               style="text-transform: none"
               @click="deletePackageById({packageId: packages[i]._id})"
@@ -72,13 +75,16 @@
     name: 'Settings',
     computed: {
       ...mapState('package', ['packages']),
+      ...mapState('auth', ['userProfile']),
     },
     mounted () {
       this.getAllPackages()
+      this.getProfile()
     },
     methods: {
       ...mapActions('dialog', ['openDialogAddPackage', 'openDialogEditPackage']),
       ...mapActions('package', ['getAllPackages', 'deletePackageById']),
+      ...mapActions('auth', ['getProfile']),
     },
   }
 </script>
