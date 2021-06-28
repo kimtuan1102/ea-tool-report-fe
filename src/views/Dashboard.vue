@@ -68,10 +68,10 @@
             >
               <div>
                 <div class="text-h4 font-weight-light">
-                  EA REPORT
+                  AI REPORT
                 </div>
                 <div class="text-caption">
-                  Report of EA copy
+                  Report of AI copy
                 </div>
               </div>
               <v-spacer />
