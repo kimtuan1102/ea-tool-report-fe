@@ -83,7 +83,10 @@
               :headers="headers"
               :items="reportData"
             >
-              <template #item.action="{ item }">
+              <template
+                v-if="userProfile.roles.includes('admin') || userProfile.roles.includes('user')"
+                #item.action="{ item }"
+              >
                 <div style="display: flex">
                   <v-icon
                     class="mx-1"
