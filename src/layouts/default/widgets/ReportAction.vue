@@ -32,7 +32,7 @@
         />
 
         <app-bar-item
-          v-else-if="(userProfile.roles && userProfile.roles.includes('admin')) || (p.title !=='Reset' || p.title !=='Send Message')"
+          v-else-if="userProfile.roles && ((userProfile.roles.includes('admin')) || (userProfile.roles.includes('user') && p.title !=='Reset') || (userProfile.roles.includes('user') && p.title==='Report'))"
           :key="`item-${i}`"
           to="/"
         >

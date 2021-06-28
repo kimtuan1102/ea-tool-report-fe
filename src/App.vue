@@ -14,7 +14,7 @@
     name: 'App',
     metaInfo: {
       title: 'App',
-      titleTemplate: '%s | EA Report',
+      titleTemplate: '%s | AI Report',
       htmlAttrs: { lang: 'en' },
       meta: [
         { charset: 'utf-8' },
